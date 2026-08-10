@@ -3,28 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divya shopee - Premium Collection</title>
+    <title>Divya shopee - Premium Footwear Collection</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background-color: #f4f6f9; color: #333; }
-        header { background: #1e293b; color: white; text-align: center; padding: 20px 15px; }
-        header h1 { font-size: 26px; font-weight: 700; }
-        header p { font-size: 14px; color: #94a3b8; margin-top: 4px; }
-        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
-        .product-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; margin-bottom: 20px; }
-        .main-img-container { width: 100%; height: 320px; background-color: #f8fafc; }
-        .main-img-container img { width: 100%; height: 100%; object-fit: cover; }
-        .details { padding: 20px; }
-        .badge { display: inline-block; background: #eff6ff; color: #2563eb; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 12px; margin-bottom: 8px; }
-        .title { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
-        .price-section { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
-        .selling-price { font-size: 24px; font-weight: 800; color: #16a34a; }
-        .mrp { font-size: 15px; color: #94a3b8; text-decoration: line-through; }
-        .specs { background: #f8fafc; border-radius: 8px; padding: 12px; margin-bottom: 20px; font-size: 13px; }
-        .spec-item { margin-bottom: 6px; color: #475569; }
-        .spec-item strong { color: #1e293b; }
-        .btn-whatsapp { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: #25d366; color: white; text-decoration: none; font-size: 16px; font-weight: 700; padding: 12px; border-radius: 10px; }
-        #loading { text-align: center; padding: 30px; font-size: 16px; color: #64748b; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #1e293b;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+        header p {
+            font-size: 14px;
+            color: #94a3b8;
+            margin: 5px 0 0 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .main-img-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .details {
+            padding: 20px;
+        }
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        .price-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .selling-price {
+            font-size: 22px;
+            font-weight: bold;
+            color: #16a34a;
+        }
+        .mrp {
+            font-size: 16px;
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+        .btn-whatsapp {
+            display: block;
+            background: #25d366;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
@@ -34,62 +88,23 @@
         <p>Premium Footwear Collection</p>
     </header>
 
-    <div class="container" id="product-container">
-        <div id="loading">Products load ho rahe hain...</div>
+    <div class="container">
+        <div class="product-card">
+            <div class="main-img-container">
+                <!-- Yahan aap apne product ki photo ka link ya naam daal sakte hain -->
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff" alt="Footwear">
+            </div>
+            <div class="details">
+                <div class="title">Stylish Premium Footwear</div>
+                <div class="price-section">
+                    <span class="selling-price">₹1,700</span>
+                    <span class="mrp">₹2,500</span>
+                </div>
+                <a href="https://wa.me/" class="btn-whatsapp" target="_blank">Order on WhatsApp</a>
+            </div>
+        </div>
     </div>
 
-    <script>
-        const sheetId = '1PDHNxST-LElVwOmtpmnBeF6z1AAPifzEF_sbNpAabdA';
-        const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
-
-        fetch(sheetUrl)
-            .then(res => res.text())
-            .then(data => {
-                const json = JSON.parse(data.substr(47).slice(0, -2));
-                const rows = json.table.rows;
-                const container = document.getElementById('product-container');
-                container.innerHTML = '';
-
-                rows.forEach((row, index) => {
-                    if (index === 0) return; // Skip header row
-                    const name = row.c[0] ? row.c[0].v : '';
-                    const mrp = row.c[1] ? row.c[1].v : '';
-                    const price = row.c[2] ? row.c[2].v : '';
-                    const quality = row.c[3] ? row.c[3].v : '';
-                    const sole = row.c[4] ? row.c[4].v : '';
-                    const photo = row.c[5] ? row.c[5].v : '';
-
-                    if(!name) return;
-
-                    const card = `
-                        <div class="product-card">
-                            <div class="main-img-container">
-                                <img src="${photo}" alt="${name}">
-                            </div>
-                            <div class="details">
-                                <span class="badge">Special Offer</span>
-                                <h2 class="title">${name}</h2>
-                                <div class="price-section">
-                                    <span class="selling-price">₹${price}</span>
-                                    ${mrp ? `<span class="mrp">₹${mrp}</span>` : ''}
-                                </div>
-                                <div class="specs">
-                                    ${quality ? `<div class="spec-item">✨ <strong>Quality:</strong> ${quality}</div>` : ''}
-                                    ${sole ? `<div class="spec-item">👟 <strong>Sole:</strong> ${sole}</div>` : ''}
-                                </div>
-                                <a href="https://wa.me/919998366986?text=Hi%20Divya%20shopee,%20I%20want%20to%20order%20${encodeURIComponent(name)}%20(Price:%20₹${price})" class="btn-whatsapp" target="_blank">
-                                    Order via WhatsApp
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                    container.innerHTML += card;
-                });
-            })
-            .catch(err => {
-                console.error(err);
-                document.getElementById('loading').innerText = 'Products load nahi ho paye. Please sheet access check karein.';
-            });
-    </script>
 </body>
 </html>
+
