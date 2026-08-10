@@ -1,27 +1,48 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Divya Shopee - Premium Collection</title>
+    <title>Divya Shopee - Catalog</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; padding: 15px; margin: 0; }
-        h1 { text-align: center; color: #1e293b; }
+        h1 { text-align: center; color: #1e293b; margin-bottom: 25px; }
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; max-width: 1000px; margin: auto; }
         .card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
-        /* Slider jise aap scroll kar sako */
-        .slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; border-radius: 10px; margin-bottom: 10px; }
-        .slider img { width: 100%; height: 220px; object-fit: cover; scroll-snap-align: start; flex: 0 0 100%; border-radius: 10px; }
+        /* Slider Styling */
+        .slider-container { position: relative; width: 100%; border-radius: 10px; overflow: hidden; background: #000; }
+        .slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; scroll-behavior: smooth; }
+        .slider::-webkit-scrollbar { display: none; }
+        .slider img { width: 100%; height: 260px; object-fit: contain; scroll-snap-align: start; flex: 0 0 100%; cursor: pointer; background: #fff; }
         
-        .name { font-size: 18px; font-weight: bold; margin: 10px 0; }
+        /* Dots indicator styling */
+        .dots { display: flex; justify-content: center; gap: 6px; margin: 8px 0; }
+        .dot { width: 8px; height: 8px; background: #cbd5e1; border-radius: 50%; transition: 0.3s; }
+        .dot.active { background: #1e293b; width: 20px; border-radius: 4px; }
+
+        .name { font-size: 18px; font-weight: bold; margin: 10px 0 5px 0; color: #1e293b; }
+        .price-box { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
         .price { color: #16a34a; font-size: 18px; font-weight: bold; }
-        .btn-order { display: block; background: #25d366; color: white; padding: 12px; text-align: center; border-radius: 8px; text-decoration: none; margin-top: 15px; }
+        .mrp { text-decoration: line-through; color: #94a3b8; font-size: 14px; }
+        .sole { font-size: 14px; color: #64748b; margin-bottom: 10px; }
+        
+        .btn-order { display: block; background: #25d366; color: white; padding: 12px; text-align: center; border-radius: 8px; text-decoration: none; font-weight: bold; }
+        
+        /* Fullscreen Modal for image zoom */
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 1000; }
+        #modal img { max-width: 90%; max-height: 90%; border-radius: 10px; }
+        #modal span { position: absolute; top: 20px; right: 30px; color: white; font-size: 35px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
     <h1>Divya Shopee</h1>
     <div class="product-grid" id="catalog"></div>
+
+    <!-- Modal for Zoom -->
+    <div id="modal" onclick="closeModal()">
+        <span onclick="closeModal()">&times;</span>
+        <img id="modal-img">
+    </div>
 
     <script>
         const sheetId = '1PDHNxST-LElVwOmtpmnBeF6z1AAPifzEF_sbNpAabdA';
@@ -30,27 +51,78 @@
         fetch(url).then(res => res.text()).then(text => {
             const data = JSON.parse(text.substr(47).slice(0, -2));
             const container = document.getElementById('catalog');
+            container.innerHTML = '';
             
-            data.table.rows.forEach(row => {
+            data.table.rows.forEach((row, index) => {
                 const name = row.c[0] ? row.c[0].v : '';
+                const mrp = row.c[1] ? row.c[1].v : '';
                 const price = row.c[2] ? row.c[2].v : '';
-                // Slider ke liye 3 photos (Column F, G, H)
-                const photos = [row.c[5], row.c[6], row.c[7]];
+                const sole = row.c[4] ? row.c[4].v : '';
+                
+                // Photos from Column F, G, H
+                const photos = [row.c[5], row.c[6], row.c[7]].filter(p => p && p.v);
                 
                 let sliderHTML = '';
-                photos.forEach(p => { if(p && p.v) sliderHTML += `<img src="${p.v}">`; });
+                let dotsHTML = '';
+                
+                photos.forEach((p, i) => {
+                    sliderHTML += `<img src="${p.v}" onclick="openModal('${p.v}')">`;
+                    if (photos.length > 1) {
+                        dotsHTML += `<div class="dot ${i === 0 ? 'active' : ''}" data-index="${i}"></div>`;
+                    }
+                });
                 
                 container.innerHTML += `
                     <div class="card">
-                        <div class="slider">${sliderHTML}</div>
+                        <div class="slider-container">
+                            <div class="slider" id="slider-${index}" onscroll="updateDots(${index}, ${photos.length})">
+                                ${sliderHTML}
+                            </div>
+                        </div>
+                        <div class="dots" id="dots-${index}">
+                            ${dotsHTML}
+                        </div>
                         <div class="name">${name}</div>
-                        <div class="price">₹${price}</div>
-                        <a href="https://wa.me/919998366986?text=I want to buy ${name}" class="btn-order">Order on WhatsApp</a>
+                        <div class="price-box">
+                            <div class="price">₹${price}</div>
+                            ${mrp ? `<div class="mrp">₹${mrp}</div>` : ''}
+                        </div>
+                        ${sole ? `<div class="sole"><b>Sole:</b> ${sole}</div>` : ''}
+                        <a href="https://wa.me/919998366986?text=I want to buy ${name}" class="btn-order" target="_blank">Order on WhatsApp</a>
                     </div>
                 `;
             });
         });
+
+        function updateDots(cardIndex, totalPhotos) {
+            const slider = document.getElementById(`slider-${cardIndex}`);
+            const dotsContainer = document.getElementById(`dots-${cardIndex}`);
+            if (!dotsContainer) return;
+            
+            const scrollLeft = slider.scrollLeft;
+            const cardWidth = slider.clientWidth;
+            const currentIndex = Math.round(scrollLeft / cardWidth);
+            
+            const dots = dotsContainer.children;
+            for (let i = 0; i < dots.length; i++) {
+                if (i === currentIndex) {
+                    dots[i].classList.add('active');
+                } else {
+                    dots[i].classList.remove('active');
+                }
+            }
+        }
+
+        function openModal(imgSrc) {
+            document.getElementById('modal-img').src = imgSrc;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
     </script>
 </body>
 </html>
+
 
