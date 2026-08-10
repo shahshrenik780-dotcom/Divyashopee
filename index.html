@@ -3,36 +3,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Divya Shopee - Catalog</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; padding: 15px; margin: 0; }
-        h1 { text-align: center; color: #1e293b; margin-bottom: 25px; }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; max-width: 1000px; margin: auto; }
-        .card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; padding: 10px; margin: 0; }
+        h1 { text-align: center; color: #1e293b; margin-bottom: 20px; }
         
-        /* Slider Styling - Photo ki height yahan 360px kar di hai taaki badi dikhe */
-        .slider-container { position: relative; width: 100%; border-radius: 10px; overflow: hidden; background: #000; }
+        /* Grid setup - jaise-jaise product daloge, ye apne aap line se poora bhar jayega */
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; max-width: 1200px; margin: auto; }
+        .card { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; }
+        
+        /* Slider Styling - Photo saaf aur badi dikhegi */
+        .slider-container { position: window; width: 100%; border-radius: 8px; overflow: hidden; background: #fff; }
         .slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; scroll-behavior: smooth; }
         .slider::-webkit-scrollbar { display: none; }
-        .slider img { width: 100%; height: 360px; object-fit: cover; scroll-snap-align: start; flex: 0 0 100%; cursor: pointer; background: #fff; }
+        .slider img { width: 100%; height: 320px; object-fit: cover; scroll-snap-align: start; flex: 0 0 100%; cursor: pointer; }
         
-        /* Dots indicator styling */
-        .dots { display: flex; justify-content: center; gap: 6px; margin: 10px 0; }
-        .dot { width: 8px; height: 8px; background: #cbd5e1; border-radius: 50%; transition: 0.3s; }
-        .dot.active { background: #1e293b; width: 20px; border-radius: 4px; }
+        /* Dots indicator */
+        .dots { display: flex; justify-content: center; gap: 5px; margin: 8px 0; }
+        .dot { width: 6px; height: 6px; background: #cbd5e1; border-radius: 50%; transition: 0.3s; }
+        .dot.active { background: #1e293b; width: 18px; border-radius: 3px; }
 
-        .name { font-size: 18px; font-weight: bold; margin: 10px 0 5px 0; color: #1e293b; }
-        .price-box { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
-        .price { color: #16a34a; font-size: 18px; font-weight: bold; }
-        .mrp { text-decoration: line-through; color: #94a3b8; font-size: 14px; }
-        .sole { font-size: 14px; color: #64748b; margin-bottom: 10px; }
+        .name { font-size: 16px; font-weight: bold; margin: 8px 0 4px 0; color: #1e293b; }
+        .price-box { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+        .price { color: #16a34a; font-size: 16px; font-weight: bold; }
+        .mrp { text-decoration: line-through; color: #94a3b8; font-size: 13px; }
+        .sole { font-size: 13px; color: #64748b; margin-bottom: 8px; }
         
-        .btn-order { display: block; background: #25d366; color: white; padding: 12px; text-align: center; border-radius: 8px; text-decoration: none; font-weight: bold; }
+        .btn-order { display: block; background: #25d366; color: white; padding: 10px; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; }
         
-        /* Fullscreen Modal for image zoom */
+        /* Fullscreen Modal for image zoom on click */
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 1000; }
-        #modal img { max-width: 90%; max-height: 90%; border-radius: 10px; }
-        #modal span { position: absolute; top: 20px; right: 30px; color: white; font-size: 35px; cursor: pointer; font-weight: bold; }
+        #modal img { max-width: 95%; max-height: 95%; border-radius: 8px; object-fit: contain; }
+        #modal span { position: absolute; top: 15px; right: 25px; color: white; font-size: 35px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -65,7 +68,6 @@
                 let sliderHTML = '';
                 let dotsHTML = '';
                 
-                photos.photos = photos; // reference
                 photos.forEach((p, i) => {
                     sliderHTML += `<img src="${p.v}" onclick="openModal('${p.v}')">`;
                     if (photos.length > 1) {
@@ -75,20 +77,22 @@
                 
                 container.innerHTML += `
                     <div class="card">
-                        <div class="slider-container">
-                            <div class="slider" id="slider-${index}" onscroll="updateDots(${index}, ${photos.length})">
-                                ${sliderHTML}
+                        <div>
+                            <div class="slider-container">
+                                <div class="slider" id="slider-${index}" onscroll="updateDots(${index}, ${photos.length})">
+                                    ${sliderHTML}
+                                </div>
                             </div>
+                            <div class="dots" id="dots-${index}">
+                                ${dotsHTML}
+                            </div>
+                            <div class="name">${name}</div>
+                            <div class="price-box">
+                                <div class="price">₹${price}</div>
+                                ${mrp ? `<div class="mrp">₹${mrp}</div>` : ''}
+                            </div>
+                            ${sole ? `<div class="sole"><b>Sole:</b> ${sole}</div>` : ''}
                         </div>
-                        <div class="dots" id="dots-${index}">
-                            ${dotsHTML}
-                        </div>
-                        <div class="name">${name}</div>
-                        <div class="price-box">
-                            <div class="price">₹${price}</div>
-                            ${mrp ? `<div class="mrp">₹${mrp}</div>` : ''}
-                        </div>
-                        ${sole ? `<div class="sole"><b>Sole:</b> ${sole}</div>` : ''}
                         <a href="https://wa.me/919998366986?text=I want to buy ${name}" class="btn-order" target="_blank">Order on WhatsApp</a>
                     </div>
                 `;
