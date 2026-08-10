@@ -3,108 +3,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divya shopee - Wilson Footwear</title>
+    <title>Divya shopee - Catalog</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background: #1e293b;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        header h1 {
-            font-size: 24px;
-            margin: 0;
-        }
-        header p {
-            font-size: 14px;
-            color: #94a3b8;
-            margin: 5px 0 0 0;
-        }
-        .container {
-            max-width: 500px;
-            margin: 20px auto;
-            padding: 0 15px;
-        }
-        .product-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .main-img-container img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        .details {
-            padding: 20px;
-        }
-        .title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #1e293b;
-            margin-bottom: 10px;
-        }
-        .price-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        .selling-price {
-            font-size: 22px;
-            font-weight: bold;
-            color: #16a34a;
-        }
-        .mrp {
-            font-size: 16px;
-            color: #94a3b8;
-            text-decoration: line-through;
-        }
-        .btn-whatsapp {
-            display: block;
-            background: #25d366;
-            color: white;
-            text-align: center;
-            padding: 12px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 16px;
-            margin-top: 15px;
-        }
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; text-align: center; }
+        header { margin-bottom: 20px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; max-width: 800px; margin: auto; }
+        .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; }
+        .btn { display: block; background: #25d366; color: white; padding: 10px; text-decoration: none; border-radius: 5px; margin-top: 10px; }
     </style>
 </head>
 <body>
-
-    <header>
-        <h1>Divya shopee</h1>
-        <p>Premium Footwear Collection</p>
-    </header>
-
-    <div class="container">
-        <div class="product-card">
-            <div class="main-img-container">
-                <img src="1786354525470.png" alt="Wilson Shoes">
-            </div>
-            <div class="details">
-                <div class="title">Wilson Shoes</div>
-                <div class="price-section">
-                    <span class="selling-price">₹1,100</span>
-                    <span class="mrp">₹1,600</span>
-                </div>
-                <a href="https://wa.me/919998366986?text=Hello,%20I%20want%20to%20buy%20Wilson%20Shoes%20for%20Rs.1100" class="btn-whatsapp" target="_blank">Order on WhatsApp</a>
-            </div>
-        </div>
+    <header><h1>Divya shopee Catalog</h1></header>
+    <div class="product-grid" id="catalog">
+        <!-- Products will load here automatically -->
     </div>
 
+    <script>
+        // Aapka Sheet link ka ID yahan hai
+        const sheetId = '1PDHNxST-LElVwOmtpmnBeF6z1AAPifzEF_sbNpAabdA';
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+
+        fetch(url).then(res => res.text()).then(text => {
+            const data = JSON.parse(text.substr(47).slice(0, -2));
+            const container = document.getElementById('catalog');
+            
+            data.table.rows.forEach(row => {
+                const name = row.c[0].v;
+                const price = row.c[2].v;
+                const photo = row.c[5].v;
+                
+                container.innerHTML += `
+                    <div class="card">
+                        <img src="${photo}" alt="${name}">
+                        <h3>${name}</h3>
+                        <p>Price: ₹${price}</p>
+                        <a href="https://wa.me/919998366986?text=I want to buy ${name}" class="btn">Order on WhatsApp</a>
+                    </div>
+                `;
+            });
+        });
+    </script>
 </body>
 </html>
 
