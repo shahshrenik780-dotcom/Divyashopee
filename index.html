@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,25 +29,25 @@
         
         .btn-order { display: block; background: #25d366; color: white; padding: 10px; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; }
         
-        /* Fullscreen Modal Slider */
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { position: relative; width: 90%; max-width: 500px; height: 80vh; display: flex; align-items: center; overflow: hidden; border-radius: 10px; }
-        .modal-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; width: 100%; height: 100%; scrollbar-width: none; scroll-behavior: smooth; }
+        /* Clean Fullscreen Modal Slider */
+        #custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-box { position: relative; width: 100%; max-width: 450px; height: 75vh; display: flex; align-items: center; }
+        .modal-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; width: 100%; height: 100%; scrollbar-width: none; scroll-behavior: smooth; border-radius: 10px; }
         .modal-slider::-webkit-scrollbar { display: none; }
-        .modal-slider img { width: 100%; height: 100%; object-fit: contain; scroll-snap-align: start; flex: 0 0 100%; }
+        .modal-slider img { width: 100%; height: 100%; object-fit: contain; scroll-snap-align: start; flex: 0 0 100%; background: #000; }
         
-        #modal span.close { position: absolute; top: 15px; right: 25px; color: white; font-size: 35px; cursor: pointer; font-weight: bold; z-index: 1001; }
+        #close-btn { position: absolute; top: 20px; right: 25px; color: white; font-size: 40px; cursor: pointer; font-weight: bold; z-index: 10000; }
     </style>
 </head>
 <body>
     <h1>Divya Shopee</h1>
     <div class="product-grid" id="catalog"></div>
 
-    <!-- Modal with Slider inside -->
-    <div id="modal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <div class="modal-content">
-            <div class="modal-slider" id="modal-slider-box"></div>
+    <!-- New Fullscreen Modal -->
+    <div id="custom-modal">
+        <span id="close-btn" onclick="closeCustomModal()">&times;</span>
+        <div class="modal-box">
+            <div class="modal-slider" id="modal-img-container"></div>
         </div>
     </div>
 
@@ -73,7 +74,7 @@
                 
                 photos.forEach((p, i) => {
                     photoUrls.push(p.v);
-                    sliderHTML += `<img src="${p.v}" onclick='openModal(${JSON.stringify(photoUrls)}, ${i})'>`;
+                    sliderHTML += `<img src="${p.v}" onclick='openCustomModal(${JSON.stringify(photoUrls)}, ${i})'>`;
                     if (photos.length > 1) {
                         dotsHTML += `<div class="dot ${i === 0 ? 'active' : ''}" data-index="${i}"></div>`;
                     }
@@ -122,24 +123,23 @@
             }
         }
 
-        function openModal(photosArray, startIndex) {
-            const modalSliderBox = document.getElementById('modal-slider-box');
-            modalSliderBox.innerHTML = '';
+        function openCustomModal(photosArray, startIndex) {
+            const modalContainer = document.getElementById('modal-img-container');
+            modalContainer.innerHTML = '';
             
             photosArray.forEach(src => {
-                modalSliderBox.innerHTML += `<img src="${src}">`;
+                modalContainer.innerHTML += `<img src="${src}">`;
             });
             
-            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('custom-modal').style.display = 'flex';
             
-            // Usi photo par scroll karein jis par click kiya tha
             setTimeout(() => {
-                modalSliderBox.scrollLeft = startIndex * modalSliderBox.clientWidth;
+                modalContainer.scrollLeft = startIndex * modalContainer.clientWidth;
             }, 50);
         }
 
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
+        function closeCustomModal() {
+            document.getElementById('custom-modal').style.display = 'none';
         }
     </script>
 </body>
