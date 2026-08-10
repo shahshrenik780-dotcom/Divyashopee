@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,14 +10,14 @@
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; max-width: 1000px; margin: auto; }
         .card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
-        /* Slider Styling */
+        /* Slider Styling - Photo ki height yahan 360px kar di hai taaki badi dikhe */
         .slider-container { position: relative; width: 100%; border-radius: 10px; overflow: hidden; background: #000; }
         .slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; scroll-behavior: smooth; }
         .slider::-webkit-scrollbar { display: none; }
-        .slider img { width: 100%; height: 260px; object-fit: contain; scroll-snap-align: start; flex: 0 0 100%; cursor: pointer; background: #fff; }
+        .slider img { width: 100%; height: 360px; object-fit: cover; scroll-snap-align: start; flex: 0 0 100%; cursor: pointer; background: #fff; }
         
         /* Dots indicator styling */
-        .dots { display: flex; justify-content: center; gap: 6px; margin: 8px 0; }
+        .dots { display: flex; justify-content: center; gap: 6px; margin: 10px 0; }
         .dot { width: 8px; height: 8px; background: #cbd5e1; border-radius: 50%; transition: 0.3s; }
         .dot.active { background: #1e293b; width: 20px; border-radius: 4px; }
 
@@ -59,12 +60,12 @@
                 const price = row.c[2] ? row.c[2].v : '';
                 const sole = row.c[4] ? row.c[4].v : '';
                 
-                // Photos from Column F, G, H
                 const photos = [row.c[5], row.c[6], row.c[7]].filter(p => p && p.v);
                 
                 let sliderHTML = '';
                 let dotsHTML = '';
                 
+                photos.photos = photos; // reference
                 photos.forEach((p, i) => {
                     sliderHTML += `<img src="${p.v}" onclick="openModal('${p.v}')">`;
                     if (photos.length > 1) {
