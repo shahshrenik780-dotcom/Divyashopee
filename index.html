@@ -3,24 +3,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Divya shopee - Catalog</title>
+    <title>Divya Shopee - Premium Collection</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; text-align: center; }
-        header { margin-bottom: 20px; }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; max-width: 800px; margin: auto; }
-        .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; }
-        .btn { display: block; background: #25d366; color: white; padding: 10px; text-decoration: none; border-radius: 5px; margin-top: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; padding: 15px; margin: 0; }
+        h1 { text-align: center; color: #1e293b; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; max-width: 1000px; margin: auto; }
+        .card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        /* Slider jise aap scroll kar sako */
+        .slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; border-radius: 10px; margin-bottom: 10px; }
+        .slider img { width: 100%; height: 220px; object-fit: cover; scroll-snap-align: start; flex: 0 0 100%; border-radius: 10px; }
+        
+        .name { font-size: 18px; font-weight: bold; margin: 10px 0; }
+        .price { color: #16a34a; font-size: 18px; font-weight: bold; }
+        .btn-order { display: block; background: #25d366; color: white; padding: 12px; text-align: center; border-radius: 8px; text-decoration: none; margin-top: 15px; }
     </style>
 </head>
 <body>
-    <header><h1>Divya shopee Catalog</h1></header>
-    <div class="product-grid" id="catalog">
-        <!-- Products will load here automatically -->
-    </div>
+    <h1>Divya Shopee</h1>
+    <div class="product-grid" id="catalog"></div>
 
     <script>
-        // Aapka Sheet link ka ID yahan hai
         const sheetId = '1PDHNxST-LElVwOmtpmnBeF6z1AAPifzEF_sbNpAabdA';
         const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
@@ -29,16 +32,20 @@
             const container = document.getElementById('catalog');
             
             data.table.rows.forEach(row => {
-                const name = row.c[0].v;
-                const price = row.c[2].v;
-                const photo = row.c[5].v;
+                const name = row.c[0] ? row.c[0].v : '';
+                const price = row.c[2] ? row.c[2].v : '';
+                // Slider ke liye 3 photos (Column F, G, H)
+                const photos = [row.c[5], row.c[6], row.c[7]];
+                
+                let sliderHTML = '';
+                photos.forEach(p => { if(p && p.v) sliderHTML += `<img src="${p.v}">`; });
                 
                 container.innerHTML += `
                     <div class="card">
-                        <img src="${photo}" alt="${name}">
-                        <h3>${name}</h3>
-                        <p>Price: ₹${price}</p>
-                        <a href="https://wa.me/919998366986?text=I want to buy ${name}" class="btn">Order on WhatsApp</a>
+                        <div class="slider">${sliderHTML}</div>
+                        <div class="name">${name}</div>
+                        <div class="price">₹${price}</div>
+                        <a href="https://wa.me/919998366986?text=I want to buy ${name}" class="btn-order">Order on WhatsApp</a>
                     </div>
                 `;
             });
