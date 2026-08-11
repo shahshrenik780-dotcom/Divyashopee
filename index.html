@@ -108,41 +108,7 @@
             const dotsContainer = document.getElementById(`dots-${cardIndex}`);
             if (!dotsContainer) return;
             
-            const scrollLeft = slider.scrollLeft;
-            const cardWidth = slider.clientWidth;
-            const currentIndex = Math.round(scrollLeft / cardWidth);
-            
-            const dots = dotsContainer.children;
-            for (let i = 0; i < dots.length; i++) {
-                if (i === currentIndex) {
-                    dots[i].classList.add('active');
-                } else {
-                    dots[i].classList.remove('active');
-                }
-            }
-        }
 
-        function openCustomModal(photosArray, startIndex) {
-            const modalContainer = document.getElementById('modal-img-container');
-            modalContainer.innerHTML = '';
-            
-            photosArray.forEach(src => {
-                modalContainer.innerHTML += `<img src="${src}">`;
-            });
-            
-            document.getElementById('custom-modal').style.display = 'flex';
-            
-            setTimeout(() => {
-                modalContainer.scrollLeft = startIndex * modalContainer.clientWidth;
-            }, 60);
-        }
-
-        function closeCustomModal() {
-            document.getElementById('custom-modal').style.display = 'none';
-        }
-    </script>
-</body>
-</html>
 
 
 
