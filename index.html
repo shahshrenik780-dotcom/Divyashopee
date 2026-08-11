@@ -24,12 +24,11 @@
         .dot.active { background: #1e293b; width: 18px; border-radius: 3px; }
 
         .name { font-size: 16px; font-weight: bold; margin: 8px 0 4px 0; color: #1e293b; }
-        .price { color: #16a34a; font-size: 16px; font-weight: bold; margin-bottom: 8px; }
+        .price { margin-bottom: 8px; }
         
         .btn-order { display: block; background: #25d366; color: white; padding: 10px; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; margin-top: 5px; }
         .btn-share { display: block; background: #64748b; color: white; padding: 8px; text-align: center; border-radius: 6px; text-decoration: none; font-size: 12px; margin-top: 5px; cursor: pointer; border: none; width: 100%; }
         
-        /* Modal Styles */
         #custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 9999; justify-content: center; align-items: center; }
         .modal-box { position: relative; width: 95%; max-width: 450px; height: 80vh; display: flex; align-items: center; }
         .modal-slider { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; width: 100%; height: 100%; scrollbar-width: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
@@ -43,7 +42,6 @@
     <div class="category-grid" id="category-buttons"></div>
     <div class="product-grid" id="catalog"></div>
 
-    <!-- Fullscreen Modal -->
     <div id="custom-modal">
         <span id="close-btn" onclick="closeCustomModal()">&times;</span>
         <div class="modal-box">
@@ -61,11 +59,12 @@
             let cats = new Set();
             data.table.rows.forEach(row => {
                 const name = row.c[0]?.v;
-                const price = row.c[2]?.v;
+                const price = row.c[2]?.v; // Selling Price
+                const mrp = row.c[3]?.v;   // MRP (Make sure this is column 4 in your sheet)
                 const photos = [row.c[5], row.c[6], row.c[7], row.c[8], row.c[9]].filter(p => p?.v).map(p => p.v);
                 const category = row.c[10]?.v?.trim() || 'Other';
                 if(name) {
-                    allProducts.push({ name, price, photos, category });
+                    allProducts.push({ name, price, mrp, photos, category });
                     cats.add(category);
                 }
             });
@@ -98,7 +97,6 @@
                     }
                 });
 
-                let safeName = p.name.replace(/'/g, "\\'");
                 container.innerHTML += `
                     <div class="card">
                         <div>
@@ -107,15 +105,16 @@
                                     ${sliderHTML}
                                 </div>
                             </div>
-                            <div class="dots" id="dots-${index}">
-                                ${dotsHTML}
-                            </div>
+                            <div class="dots" id="dots-${index}">${dotsHTML}</div>
                             <div class="name">${p.name}</div>
-                            <div class="price">₹${p.price}</div>
+                            <div class="price">
+                                <span style="color: #16a34a; font-size: 18px; font-weight: bold;">₹${p.price}</span>
+                                <span style="color: #94a3b8; text-decoration: line-through; font-size: 14px; margin-left: 8px;">₹${p.mrp}</span>
+                            </div>
                         </div>
                         <div>
                             <a href="https://wa.me/919998366986?text=I want to buy ${p.name}" class="btn-order" target="_blank">Order on WhatsApp</a>
-                            <button class="btn-share" onclick="shareProduct('${safeName}', '${p.price}')">Share Product</button>
+                            <button class="btn-share" onclick="shareProduct('${p.name}', '${p.price}')">Share Product</button>
                         </div>
                     </div>`;
             });
@@ -125,57 +124,35 @@
             const slider = document.getElementById(`slider-${cardIndex}`);
             const dotsContainer = document.getElementById(`dots-${cardIndex}`);
             if (!dotsContainer) return;
-            
             const scrollLeft = slider.scrollLeft;
             const cardWidth = slider.clientWidth;
             const currentIndex = Math.round(scrollLeft / cardWidth);
-            
             const dots = dotsContainer.children;
             for (let i = 0; i < dots.length; i++) {
-                if (i === currentIndex) {
-                    dots[i].classList.add('active');
-                } else {
-                    dots[i].classList.remove('active');
-                }
+                dots[i].className = i === currentIndex ? 'dot active' : 'dot';
             }
         }
 
         function openCustomModal(productIndex, photoIndex, currentCategory) {
             let filteredList = currentCategory === 'ALL' ? allProducts : allProducts.filter(p => p.category === currentCategory);
             const product = filteredList[productIndex];
-
             const modalContainer = document.getElementById('modal-img-container');
-            modalContainer.innerHTML = '';
-            
-            product.photos.forEach(src => {
-                modalContainer.innerHTML += `<img src="${src}">`;
-            });
-            
+            modalContainer.innerHTML = product.photos.map(src => `<img src="${src}">`).join('');
             document.getElementById('custom-modal').style.display = 'flex';
-            
-            setTimeout(() => {
-                modalContainer.scrollLeft = photoIndex * modalContainer.clientWidth;
-            }, 60);
+            setTimeout(() => { modalContainer.scrollLeft = photoIndex * modalContainer.clientWidth; }, 60);
         }
 
-        function closeCustomModal() {
-            document.getElementById('custom-modal').style.display = 'none';
-        }
+        function closeCustomModal() { document.getElementById('custom-modal').style.display = 'none'; }
 
         function shareProduct(name, price) {
             if (navigator.share) {
-                navigator.share({
-                    title: 'Divya Shopee',
-                    text: `Check out this product: ${name} for ₹${price}. Order now from Divya Shopee!`,
-                    url: window.location.href
-                }).catch((error) => console.log('Sharing failed', error));
-            } else {
-                alert('Link: ' + window.location.href);
-            }
+                navigator.share({ title: 'Divya Shopee', text: `Product: ${name}, Price: ₹${price}. Order from Divya Shopee!`, url: window.location.href });
+            } else { alert('Link: ' + window.location.href); }
         }
     </script>
 </body>
 </html>
+
 
 
 
