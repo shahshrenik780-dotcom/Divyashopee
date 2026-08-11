@@ -3,44 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divya Shopee - Complete Catalog</title>
+    <title>Divya Shopee - Catalog</title>
     <style>
-        /* Styling wahi hai jo aapko pasand aayi thi */
-        body { font-family: sans-serif; background: #f8fafc; padding: 10px; margin: 0; }
-        h1 { text-align: center; color: #1e293b; margin-bottom: 20px; }
-        .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 500px; margin: 0 auto 20px; }
-        .cat-btn { background: #2563eb; color: white; padding: 12px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; padding: 10px; margin: 0; }
+        h1 { text-align: center; color: #1e293b; margin-bottom: 20px; font-size: 26px; }
+        .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 500px; margin: 0 auto 25px auto; }
+        .cat-btn { background: #2563eb; color: white; padding: 16px 10px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 15px; cursor: pointer; border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         .cat-btn.all-cat { background: #0f172a; }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; max-width: 1200px; margin: auto; }
-        .card { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .slider-container { position: relative; width: 100%; overflow: hidden; border-radius: 8px; }
-        .slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
-        .slider::-webkit-scrollbar { display: none; }
-        .slider img { width: 100%; height: 280px; object-fit: cover; scroll-snap-align: start; flex: 0 0 100%; cursor: pointer; }
-        .dots { display: flex; justify-content: center; gap: 5px; margin: 8px 0; }
-        .dot { width: 6px; height: 6px; background: #cbd5e1; border-radius: 50%; }
-        .dot.active { background: #1e293b; width: 16px; border-radius: 3px; }
-        .name { font-weight: bold; margin: 8px 0; }
-        .price { color: #16a34a; font-weight: bold; }
-        .mrp { color: #94a3b8; text-decoration: line-through; margin-left: 8px; }
-        .btn-order { display: block; background: #25d366; color: white; padding: 10px; text-align: center; border-radius: 6px; text-decoration: none; margin-top: 10px; font-weight: bold; }
-        .btn-share { display: block; background: #64748b; color: white; padding: 8px; text-align: center; border-radius: 6px; text-decoration: none; margin-top: 8px; cursor: pointer; border: none; width: 100%; }
         
-        /* Modal (Popup) */
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
-        #modal img { max-width: 90%; max-height: 80%; object-fit: contain; }
-        #close-btn { position: absolute; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; max-width: 1200px; margin: auto; }
+        .card { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .slider-container { position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #fff; }
+        .slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .slider::-webkit-scrollbar { display: none; }
+        .slider img { width: 100%; height: 320px; object-fit: cover; scroll-snap-align: start; flex: 0 0 100%; cursor: pointer; }
+        
+        .dots { display: flex; justify-content: center; gap: 5px; margin: 8px 0; }
+        .dot { width: 6px; height: 6px; background: #cbd5e1; border-radius: 50%; transition: 0.3s; }
+        .dot.active { background: #1e293b; width: 18px; border-radius: 3px; }
+
+        .name { font-size: 16px; font-weight: bold; margin: 8px 0 4px 0; color: #1e293b; }
+        .price { margin-bottom: 8px; }
+        
+        .btn-order { display: block; background: #25d366; color: white; padding: 10px; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; margin-top: 5px; }
+        .btn-share { display: block; background: #64748b; color: white; padding: 8px; text-align: center; border-radius: 6px; text-decoration: none; font-size: 12px; margin-top: 5px; cursor: pointer; border: none; width: 100%; }
+        
+        #custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-box { position: relative; width: 95%; max-width: 450px; height: 80vh; display: flex; align-items: center; }
+        .modal-slider { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; width: 100%; height: 100%; scrollbar-width: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .modal-slider::-webkit-scrollbar { display: none; }
+        .modal-slider img { width: 100%; height: 100%; object-fit: contain; scroll-snap-align: start; flex: 0 0 100%; background: transparent; }
+        #close-btn { position: absolute; top: 15px; right: 20px; color: white; font-size: 40px; cursor: pointer; font-weight: bold; z-index: 10000; }
     </style>
 </head>
 <body>
-
     <h1>Divya Shopee</h1>
     <div class="category-grid" id="category-buttons"></div>
     <div class="product-grid" id="catalog"></div>
 
-    <div id="modal" onclick="closeModal()">
-        <span id="close-btn">&times;</span>
-        <img id="modal-img" src="">
+    <div id="custom-modal">
+        <span id="close-btn" onclick="closeCustomModal()">&times;</span>
+        <div class="modal-box">
+            <div class="modal-slider" id="modal-img-container"></div>
+        </div>
     </div>
 
     <script>
@@ -48,56 +54,134 @@
         const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
         let allProducts = [];
 
-        fetch(url).then(res => res.text()).then(text => {
-            const data = JSON.parse(text.substr(47).slice(0, -2));
-            let cats = new Set();
-            data.table.rows.forEach(row => {
-                if(!row.c[0]?.v) return;
-                const p = {
-                    name: row.c[0].v, mrp: row.c[1]?.v, price: row.c[2]?.v,
-                    photos: [row.c[5], row.c[6], row.c[7], row.c[8], row.c[9]].filter(x => x?.v).map(x => x.v),
-                    category: row.c[10]?.v?.trim() || 'Other'
-                };
-                allProducts.push(p);
-                cats.add(p.category);
-            });
-            renderCats(Array.from(cats));
-            renderProducts('ALL');
+        fetch(url)
+        .then(res => res.text())
+        .then(text => {
+            try {
+                const jsonStr = text.substring(47, text.length - 2);
+                const data = JSON.parse(jsonStr);
+                let cats = new Set();
+                
+                if (data && data.table && data.table.rows) {
+                    data.table.rows.forEach(row => {
+                        if (!row || !row.c || !row.c[0] || !row.c[0].v) return;
+                        
+                        const name = row.c[0] ? row.c[0].v : '';
+                        const mrp = row.c[1] ? row.c[1].v : '';
+                        const price = row.c[2] ? row.c[2].v : '';
+                        
+                        let photos = [];
+                        for (let i = 5; i <= 9; i++) {
+                            if (row.c[i] && row.c[i].v) {
+                                photos.push(row.c[i].v);
+                            }
+                        }
+                        
+                        const category = row.c[10] && row.c[10].v ? row.c[10].v.trim() : 'Other';
+                        
+                        if (name) {
+                            allProducts.push({ name, price, mrp, photos, category });
+                            cats.add(category);
+                        }
+                    });
+                }
+                renderCats(Array.from(cats));
+                render('ALL');
+            } catch (err) {
+                console.error("Data parse error:", err);
+                document.getElementById('catalog').innerHTML = '<p style="text-align:center; color:red; grid-column: 1/-1;">Data load karne mein dikkat aayi hai. Kripya sheet check karein.</p>';
+            }
+        })
+        .catch(err => {
+            console.error("Fetch error:", err);
         });
 
         function renderCats(cats) {
             const container = document.getElementById('category-buttons');
-            cats.forEach(c => container.innerHTML += `<button class="cat-btn" onclick="renderProducts('${c}')">${c}</button>`);
-            container.innerHTML += `<button class="cat-btn all-cat" onclick="renderProducts('ALL')">All</button>`;
+            container.innerHTML = '';
+            cats.forEach(c => {
+                container.innerHTML += `<button class="cat-btn" onclick="render('${c}')">${c}</button>`;
+            });
+            container.innerHTML += `<button class="cat-btn all-cat" onclick="render('ALL')">All Categories</button>`;
         }
 
-        function renderProducts(cat) {
+        function render(cat = 'ALL') {
             const container = document.getElementById('catalog');
             container.innerHTML = '';
             const filtered = (cat === 'ALL') ? allProducts : allProducts.filter(p => p.category === cat);
             
-            filtered.forEach((p, idx) => {
-                let slides = p.photos.map(src => `<img src="${src}" onclick="openModal('${src}')">`).join('');
+            filtered.forEach((p, index) => {
+                let sliderHTML = '';
+                let dotsHTML = '';
+                
+                if (p.photos.length > 0) {
+                    p.photos.forEach((photoUrl, i) => {
+                        sliderHTML += `<img src="${photoUrl}" onclick="openCustomModal(${index}, ${i}, '${cat}')">`;
+                        if (p.photos.length > 1) {
+                            dotsHTML += `<div class="dot ${i === 0 ? 'active' : ''}"></div>`;
+                        }
+                    });
+                } else {
+                    sliderHTML += `<div style="height:320px; display:flex; align-items:center; justify-content:center; background:#eee; color:#666;">No Image</div>`;
+                }
+
                 container.innerHTML += `
                     <div class="card">
-                        <div class="slider-container"><div class="slider">${slides}</div></div>
-                        <div class="name">${p.name}</div>
-                        <div><span class="price">₹${p.price}</span><span class="mrp">₹${p.mrp}</span></div>
-                        <a href="https://wa.me/919998366986?text=Order: ${p.name}" class="btn-order" target="_blank">Order on WhatsApp</a>
-                        <button class="btn-share" onclick="shareProd('${p.name}', '${p.price}', '${p.mrp}')">Share Product</button>
+                        <div>
+                            <div class="slider-container">
+                                <div class="slider" id="slider-${index}" onscroll="updateDots(${index})">
+                                    ${sliderHTML}
+                                </div>
+                            </div>
+                            <div class="dots" id="dots-${index}">${dotsHTML}</div>
+                            <div class="name">${p.name}</div>
+                            <div class="price">
+                                <span style="color: #16a34a; font-size: 18px; font-weight: bold;">₹${p.price}</span>
+                                <span style="color: #94a3b8; text-decoration: line-through; font-size: 14px; margin-left: 8px;">₹${p.mrp}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <a href="https://wa.me/919998366986?text=I want to buy ${encodeURIComponent(p.name)}" class="btn-order" target="_blank">Order on WhatsApp</a>
+                            <button class="btn-share" onclick="shareProduct('${encodeURIComponent(p.name)}', '${p.price}', '${p.mrp}')">Share Product</button>
+                        </div>
                     </div>`;
             });
         }
 
-        function openModal(src) { document.getElementById('modal-img').src = src; document.getElementById('modal').style.display = 'flex'; }
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
-        function shareProd(name, p, m) {
-            const msg = `*Product:* ${name}\n*Price:* ₹${p} (MRP: ₹${m})\n*View:* ${window.location.href}`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+        function updateDots(cardIndex) {
+            const slider = document.getElementById(`slider-${cardIndex}`);
+            const dotsContainer = document.getElementById(`dots-${cardIndex}`);
+            if (!dotsContainer) return;
+            const scrollLeft = slider.scrollLeft;
+            const cardWidth = slider.clientWidth;
+            const currentIndex = Math.round(scrollLeft / cardWidth);
+            const dots = dotsContainer.children;
+            for (let i = 0; i < dots.length; i++) {
+                dots[i].className = i === currentIndex ? 'dot active' : 'dot';
+            }
+        }
+
+        function openCustomModal(productIndex, photoIndex, currentCategory) {
+            let filteredList = currentCategory === 'ALL' ? allProducts : allProducts.filter(p => p.category === currentCategory);
+            const product = filteredList[productIndex];
+            const modalContainer = document.getElementById('modal-img-container');
+            modalContainer.innerHTML = product.photos.map(src => `<img src="${src}">`).join('');
+            document.getElementById('custom-modal').style.display = 'flex';
+            setTimeout(() => { modalContainer.scrollLeft = photoIndex * modalContainer.clientWidth; }, 60);
+        }
+
+        function closeCustomModal() { document.getElementById('custom-modal').style.display = 'none'; }
+
+        function shareProduct(nameEncoded, price, mrp) {
+            const name = decodeURIComponent(nameEncoded);
+            const text = `*Divya Shopee Product*\n\n*${name}*\nPrice: ₹${price} (MRP: ₹${mrp})\n\nCheck out this product here: ${window.location.href}`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(whatsappUrl, '_blank');
         }
     </script>
 </body>
 </html>
+
 
 
 
