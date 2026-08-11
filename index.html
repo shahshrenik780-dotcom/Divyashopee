@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+  <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -28,23 +29,29 @@
         
         .btn-order { display: block; background: #25d366; color: white; padding: 10px; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; }
         
-        /* Fixed Fullscreen Modal Slider for Mobile Touch */
+        /* Modal with Arrows */
         #custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-box { position: relative; width: 95%; max-width: 500px; height: 80vh; display: flex; align-items: center; }
-        .modal-slider { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; width: 100%; height: 100%; scrollbar-width: none; scroll-behavior: smooth; border-radius: 10px; -webkit-overflow-scrolling: touch; touch-action: pan-x; }
+        .modal-box { position: relative; width: 95%; max-width: 450px; height: 80vh; display: flex; align-items: center; }
+        .modal-slider { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; width: 100%; height: 100%; scrollbar-width: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         .modal-slider::-webkit-scrollbar { display: none; }
         .modal-slider img { width: 100%; height: 100%; object-fit: contain; scroll-snap-align: start; flex: 0 0 100%; background: transparent; }
         
         #close-btn { position: absolute; top: 15px; right: 20px; color: white; font-size: 40px; cursor: pointer; font-weight: bold; z-index: 10000; }
+        
+        .modal-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.3); color: white; border: none; font-size: 24px; padding: 12px 16px; cursor: pointer; border-radius: 50%; z-index: 10000; }
+        .modal-arrow.left { left: 10px; }
+        .modal-arrow.right { right: 10px; }
     </style>
 </head>
 <body>
     <h1>Divya Shopee</h1>
     <div class="product-grid" id="catalog"></div>
 
-    <!-- Fullscreen Modal -->
+    <!-- Fullscreen Modal with Arrows -->
     <div id="custom-modal">
         <span id="close-btn" onclick="closeCustomModal()">&times;</span>
+        <button class="modal-arrow left" onclick="scrollModal(-1)">&#10094;</button>
+        <button class="modal-arrow right" onclick="scrollModal(1)">&#10095;</button>
         <div class="modal-box">
             <div class="modal-slider" id="modal-img-container"></div>
         </div>
@@ -53,6 +60,8 @@
     <script>
         const sheetId = '1PDHNxST-LElVwOmtpmnBeF6z1AAPifzEF_sbNpAabdA';
         const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+
+        let productsData = [];
 
         fetch(url).then(res => res.text()).then(text => {
             const data = JSON.parse(text.substr(47).slice(0, -2));
@@ -66,14 +75,13 @@
                 const sole = row.c[4] ? row.c[4].v : '';
                 
                 const photos = [row.c[5], row.c[6], row.c[7]].filter(p => p && p.v);
+                productsData[index] = photos;
                 
                 let sliderHTML = '';
                 let dotsHTML = '';
-                let photoUrls = [];
                 
                 photos.forEach((p, i) => {
-                    photoUrls.push(p.v);
-                    sliderHTML += `<img src="${p.v}" onclick='openCustomModal(${JSON.stringify(photoUrls)}, ${i})'>`;
+                    sliderHTML += `<img src="${p.v}" onclick="openCustomModal(${index}, ${i})">`;
                     if (photos.length > 1) {
                         dotsHTML += `<div class="dot ${i === 0 ? 'active' : ''}" data-index="${i}"></div>`;
                     }
@@ -108,6 +116,49 @@
             const dotsContainer = document.getElementById(`dots-${cardIndex}`);
             if (!dotsContainer) return;
             
+            const scrollLeft = slider.scrollLeft;
+            const cardWidth = slider.clientWidth;
+            const currentIndex = Math.round(scrollLeft / cardWidth);
+            
+            const dots = dotsContainer.children;
+            for (let i = 0; i < dots.length; i++) {
+                if (i === currentIndex) {
+                    dots[i].classList.add('active');
+                } else {
+                    dots[i].classList.remove('active');
+                }
+            }
+        }
+
+        function openCustomModal(productIndex, startIndex) {
+            const photos = productsData[productIndex];
+            const modalContainer = document.getElementById('modal-img-container');
+            modalContainer.innerHTML = '';
+            
+            photos.forEach(p => {
+                modalContainer.innerHTML += `<img src="${p.v}">`;
+            });
+            
+            document.getElementById('custom-modal').style.display = 'flex';
+            
+            setTimeout(() => {
+                modalContainer.scrollLeft = startIndex * modalContainer.clientWidth;
+            }, 60);
+        }
+
+        function scrollModal(direction) {
+            const modalContainer = document.getElementById('modal-img-container');
+            const cardWidth = modalContainer.clientWidth;
+            modalContainer.scrollLeft += direction * cardWidth;
+        }
+
+        function closeCustomModal() {
+            document.getElementById('custom-modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
+          
 
 
 
