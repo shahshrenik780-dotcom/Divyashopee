@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -102,56 +103,6 @@
                         <div>
                             <div class="slider-container">
                                 <div class="slider" id="slider-${index}" onscroll="updateDots(${index})">
-                                    ${sliderHTML}
-                                </div>
-                            </div>
-                            <div class="dots" id="dots-${index}">${dotsHTML}</div>
-                            <div class="name">${p.name}</div>
-                            <div class="price">
-                                <span style="color: #16a34a; font-size: 18px; font-weight: bold;">₹${p.price}</span>
-                                <span style="color: #94a3b8; text-decoration: line-through; font-size: 14px; margin-left: 8px;">₹${p.mrp}</span>
-                            </div>
-                        </div>
-                        <div>
-                            <a href="https://wa.me/919998366986?text=I want to buy ${p.name}" class="btn-order" target="_blank">Order on WhatsApp</a>
-                            <button class="btn-share" onclick="shareProduct('${p.name}', '${p.price}')">Share Product</button>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        function updateDots(cardIndex) {
-            const slider = document.getElementById(`slider-${cardIndex}`);
-            const dotsContainer = document.getElementById(`dots-${cardIndex}`);
-            if (!dotsContainer) return;
-            const scrollLeft = slider.scrollLeft;
-            const cardWidth = slider.clientWidth;
-            const currentIndex = Math.round(scrollLeft / cardWidth);
-            const dots = dotsContainer.children;
-            for (let i = 0; i < dots.length; i++) {
-                dots[i].className = i === currentIndex ? 'dot active' : 'dot';
-            }
-        }
-
-        function openCustomModal(productIndex, photoIndex, currentCategory) {
-            let filteredList = currentCategory === 'ALL' ? allProducts : allProducts.filter(p => p.category === currentCategory);
-            const product = filteredList[productIndex];
-            const modalContainer = document.getElementById('modal-img-container');
-            modalContainer.innerHTML = product.photos.map(src => `<img src="${src}">`).join('');
-            document.getElementById('custom-modal').style.display = 'flex';
-            setTimeout(() => { modalContainer.scrollLeft = photoIndex * modalContainer.clientWidth; }, 60);
-        }
-
-        function closeCustomModal() { document.getElementById('custom-modal').style.display = 'none'; }
-
-        function shareProduct(name, price) {
-            if (navigator.share) {
-                navigator.share({ title: 'Divya Shopee', text: `Product: ${name}, Price: ₹${price}. Order from Divya Shopee!`, url: window.location.href });
-            } else { alert('Link: ' + window.location.href); }
-        }
-    </script>
-</body>
-</html>
 
 
 
