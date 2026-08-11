@@ -11,14 +11,22 @@
         .cat-btn { background: #2563eb; color: white; padding: 16px 10px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 15px; cursor: pointer; border: none; }
         .cat-btn.all-cat { background: #0f172a; }
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; max-width: 1200px; margin: auto; }
-        .card { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .slider-container { position: relative; width: 100%; border-radius: 8px; overflow: hidden; }
-        .slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .card { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .slider-container { position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #fff; }
+        .slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .slider::-webkit-scrollbar { display: none; }
         .slider img { width: 100%; height: 320px; object-fit: cover; scroll-snap-align: start; flex: 0 0 100%; }
-        .name { font-size: 16px; font-weight: bold; margin: 8px 0; }
-        .price { color: #16a34a; font-weight: bold; }
-        .btn-order { display: block; background: #25d366; color: white; padding: 10px; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 10px; }
-        .btn-share { display: block; background: #64748b; color: white; padding: 8px; text-align: center; border-radius: 6px; text-decoration: none; font-size: 12px; margin-top: 5px; cursor: pointer; border: none; width: 100%;}
+        
+        .dots { display: flex; justify-content: center; gap: 5px; margin: 8px 0; }
+        .dot { width: 6px; height: 6px; background: #cbd5e1; border-radius: 50%; transition: 0.3s; }
+        .dot.active { background: #1e293b; width: 18px; border-radius: 3px; }
+
+        .name { font-size: 16px; font-weight: bold; margin: 8px 0 4px 0; color: #1e293b; }
+        .price { color: #16a34a; font-size: 16px; font-weight: bold; margin-bottom: 8px; }
+        
+        .btn-order { display: block; background: #25d366; color: white; padding: 10px; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; margin-top: 5px; }
+        .btn-share { display: block; background: #64748b; color: white; padding: 8px; text-align: center; border-radius: 6px; text-decoration: none; font-size: 12px; margin-top: 5px; cursor: pointer; border: none; width: 100%; }
     </style>
 </head>
 <body>
@@ -33,35 +41,103 @@
 
         fetch(url).then(res => res.text()).then(text => {
             const data = JSON.parse(text.substr(47).slice(0, -2));
+            let cats = new Set();
             data.table.rows.forEach(row => {
                 const name = row.c[0]?.v;
                 const price = row.c[2]?.v;
                 const photos = [row.c[5], row.c[6], row.c[7], row.c[8], row.c[9]].filter(p => p?.v).map(p => p.v);
                 const category = row.c[10]?.v?.trim() || 'Other';
-                allProducts.push({ name, price, photos, category });
+                if(name) {
+                    allProducts.push({ name, price, photos, category });
+                    cats.add(category);
+                }
             });
-            render();
+            renderCats(Array.from(cats));
+            render('ALL');
         });
+
+        function renderCats(cats) {
+            const container = document.getElementById('category-buttons');
+            container.innerHTML = '';
+            cats.forEach(c => {
+                container.innerHTML += `<button class="cat-btn" onclick="render('${c}')">${c}</button>`;
+            });
+            container.innerHTML += `<button class="cat-btn all-cat" onclick="render('ALL')">All Categories</button>`;
+        }
 
         function render(cat = 'ALL') {
             const container = document.getElementById('catalog');
             container.innerHTML = '';
             const filtered = (cat === 'ALL') ? allProducts : allProducts.filter(p => p.category === cat);
             
-            filtered.forEach(p => {
+            filtered.forEach((p, index) => {
+                let sliderHTML = '';
+                let dotsHTML = '';
+                
+                p.photos.forEach((photoUrl, i) => {
+                    sliderHTML += `<img src="${photoUrl}">`;
+                    if (p.photos.length > 1) {
+                        dotsHTML += `<div class="dot ${i === 0 ? 'active' : ''}"></div>`;
+                    }
+                });
+
+                let safeName = p.name.replace(/'/g, "\\'");
                 container.innerHTML += `
                     <div class="card">
-                        <div class="slider"><img src="${p.photos[0]}"></div>
-                        <div class="name">${p.name}</div>
-                        <div class="price">₹${p.price}</div>
-                        <a href="https://wa.me/919998366986?text=I want to buy ${p.name}" class="btn-order">Order on WhatsApp</a>
-                        <button class="btn-share" onclick="alert('Link for ${p.name}: https://divyashopee.github.io/index.html')">Share Product</button>
+                        <div>
+                            <div class="slider-container">
+                                <div class="slider" id="slider-${index}" onscroll="updateDots(${index})">
+                                    ${sliderHTML}
+                                </div>
+                            </div>
+                            <div class="dots" id="dots-${index}">
+                                ${dotsHTML}
+                            </div>
+                            <div class="name">${p.name}</div>
+                            <div class="price">₹${p.price}</div>
+                        </div>
+                        <div>
+                            <a href="https://wa.me/919998366986?text=I want to buy ${p.name}" class="btn-order" target="_blank">Order on WhatsApp</a>
+                            <button class="btn-share" onclick="shareProduct('${safeName}', '${p.price}')">Share Product</button>
+                        </div>
                     </div>`;
             });
+        }
+
+        function updateDots(cardIndex) {
+            const slider = document.getElementById(`slider-${cardIndex}`);
+            const dotsContainer = document.getElementById(`dots-${cardIndex}`);
+            if (!dotsContainer) return;
+            
+            const scrollLeft = slider.scrollLeft;
+            const cardWidth = slider.clientWidth;
+            const currentIndex = Math.round(scrollLeft / cardWidth);
+            
+            const dots = dotsContainer.children;
+            for (let i = 0; i < dots.length; i++) {
+                if (i === currentIndex) {
+                    dots[i].classList.add('active');
+                } else {
+                    dots[i].classList.remove('active');
+                }
+            }
+        }
+
+        function shareProduct(name, price) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Divya Shopee',
+                    text: `Check out this product: ${name} for ₹${price}. Order now from Divya Shopee!`,
+                    url: window.location.href
+                }).catch((error) => console.log('Sharing failed', error));
+            } else {
+                alert('Link: ' + window.location.href);
+            }
         }
     </script>
 </body>
 </html>
+
 
 
           
