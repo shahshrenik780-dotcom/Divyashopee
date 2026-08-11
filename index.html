@@ -8,15 +8,16 @@
         body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; padding: 10px; margin: 0; }
         h1 { text-align: center; color: #1e293b; margin-bottom: 20px; font-size: 26px; }
         .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 500px; margin: 0 auto 25px auto; }
-        .cat-btn { background: #2563eb; color: white; padding: 16px 10px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 15px; cursor: pointer; border: none; }
+        .cat-btn { background: #2563eb; color: white; padding: 16px 10px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 15px; cursor: pointer; border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         .cat-btn.all-cat { background: #0f172a; }
+        
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; max-width: 1200px; margin: auto; }
         .card { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; }
         
         .slider-container { position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #fff; }
         .slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         .slider::-webkit-scrollbar { display: none; }
-        .slider img { width: 100%; height: 320px; object-fit: cover; scroll-snap-align: start; flex: 0 0 100%; }
+        .slider img { width: 100%; height: 320px; object-fit: cover; scroll-snap-align: start; flex: 0 0 100%; cursor: pointer; }
         
         .dots { display: flex; justify-content: center; gap: 5px; margin: 8px 0; }
         .dot { width: 6px; height: 6px; background: #cbd5e1; border-radius: 50%; transition: 0.3s; }
@@ -27,12 +28,28 @@
         
         .btn-order { display: block; background: #25d366; color: white; padding: 10px; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; margin-top: 5px; }
         .btn-share { display: block; background: #64748b; color: white; padding: 8px; text-align: center; border-radius: 6px; text-decoration: none; font-size: 12px; margin-top: 5px; cursor: pointer; border: none; width: 100%; }
+        
+        /* Modal Styles */
+        #custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-box { position: relative; width: 95%; max-width: 450px; height: 80vh; display: flex; align-items: center; }
+        .modal-slider { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; width: 100%; height: 100%; scrollbar-width: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .modal-slider::-webkit-scrollbar { display: none; }
+        .modal-slider img { width: 100%; height: 100%; object-fit: contain; scroll-snap-align: start; flex: 0 0 100%; background: transparent; }
+        #close-btn { position: absolute; top: 15px; right: 20px; color: white; font-size: 40px; cursor: pointer; font-weight: bold; z-index: 10000; }
     </style>
 </head>
 <body>
     <h1>Divya Shopee</h1>
     <div class="category-grid" id="category-buttons"></div>
     <div class="product-grid" id="catalog"></div>
+
+    <!-- Fullscreen Modal -->
+    <div id="custom-modal">
+        <span id="close-btn" onclick="closeCustomModal()">&times;</span>
+        <div class="modal-box">
+            <div class="modal-slider" id="modal-img-container"></div>
+        </div>
+    </div>
 
     <script>
         const sheetId = '1PDHNxST-LElVwOmtpmnBeF6z1AAPifzEF_sbNpAabdA';
@@ -75,7 +92,7 @@
                 let dotsHTML = '';
                 
                 p.photos.forEach((photoUrl, i) => {
-                    sliderHTML += `<img src="${photoUrl}">`;
+                    sliderHTML += `<img src="${photoUrl}" onclick="openCustomModal(${index}, ${i}, '${cat}')">`;
                     if (p.photos.length > 1) {
                         dotsHTML += `<div class="dot ${i === 0 ? 'active' : ''}"></div>`;
                     }
@@ -123,6 +140,28 @@
             }
         }
 
+        function openCustomModal(productIndex, photoIndex, currentCategory) {
+            let filteredList = currentCategory === 'ALL' ? allProducts : allProducts.filter(p => p.category === currentCategory);
+            const product = filteredList[productIndex];
+
+            const modalContainer = document.getElementById('modal-img-container');
+            modalContainer.innerHTML = '';
+            
+            product.photos.forEach(src => {
+                modalContainer.innerHTML += `<img src="${src}">`;
+            });
+            
+            document.getElementById('custom-modal').style.display = 'flex';
+            
+            setTimeout(() => {
+                modalContainer.scrollLeft = photoIndex * modalContainer.clientWidth;
+            }, 60);
+        }
+
+        function closeCustomModal() {
+            document.getElementById('custom-modal').style.display = 'none';
+        }
+
         function shareProduct(name, price) {
             if (navigator.share) {
                 navigator.share({
@@ -137,6 +176,7 @@
     </script>
 </body>
 </html>
+
 
 
 
