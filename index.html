@@ -1,5 +1,4 @@
-
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,8 +6,17 @@
     <title>Divya Shopee - Catalog</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; padding: 10px; margin: 0; }
-        h1 { text-align: center; color: #1e293b; margin-bottom: 20px; }
+        h1 { text-align: center; color: #1e293b; margin-bottom: 20px; font-size: 26px; }
         
+        /* Category Grid Style (Blue & Dark Buttons) */
+        .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 500px; margin: 0 auto 25px auto; }
+        .cat-btn { background: #2563eb; color: white; padding: 16px 10px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 15px; cursor: pointer; border: none; transition: 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .cat-btn:active { transform: scale(0.98); background: #1d4ed8; }
+        .cat-btn.all-cat { background: #0f172a; }
+        
+        .section-title { text-align: center; margin: 20px 0 4px 0; font-size: 24px; font-weight: bold; color: #1e293b; text-transform: capitalize; }
+        .section-subtitle { text-align: center; color: #64748b; font-size: 14px; margin-bottom: 20px; }
+
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; max-width: 1200px; margin: auto; }
         .card { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; }
         
@@ -29,7 +37,7 @@
         
         .btn-order { display: block; background: #25d366; color: white; padding: 10px; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; }
         
-        /* Modal with Arrows */
+        /* Fullscreen Modal */
         #custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 9999; justify-content: center; align-items: center; }
         .modal-box { position: relative; width: 95%; max-width: 450px; height: 80vh; display: flex; align-items: center; }
         .modal-slider { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; width: 100%; height: 100%; scrollbar-width: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
@@ -45,9 +53,16 @@
 </head>
 <body>
     <h1>Divya Shopee</h1>
+
+    <!-- Category Buttons Section -->
+    <div class="category-grid" id="category-buttons"></div>
+
+    <div class="section-title" id="section-heading">Trending Products</div>
+    <div class="section-subtitle">Our trends that customers love!</div>
+
     <div class="product-grid" id="catalog"></div>
 
-    <!-- Fullscreen Modal with Arrows -->
+    <!-- Fullscreen Modal -->
     <div id="custom-modal">
         <span id="close-btn" onclick="closeCustomModal()">&times;</span>
         <button class="modal-arrow left" onclick="scrollModal(-1)">&#10094;</button>
@@ -61,29 +76,75 @@
         const sheetId = '1PDHNxST-LElVwOmtpmnBeF6z1AAPifzEF_sbNpAabdA';
         const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
-        let productsData = [];
+        let allProducts = [];
 
         fetch(url).then(res => res.text()).then(text => {
             const data = JSON.parse(text.substr(47).slice(0, -2));
-            const container = document.getElementById('catalog');
-            container.innerHTML = '';
+            allProducts = [];
+            let categoriesSet = new Set();
             
-            data.table.rows.forEach((row, index) => {
+            data.table.rows.forEach((row) => {
                 const name = row.c[0] ? row.c[0].v : '';
                 const mrp = row.c[1] ? row.c[1].v : '';
                 const price = row.c[2] ? row.c[2].v : '';
                 const sole = row.c[4] ? row.c[4].v : '';
                 
-                const photos = [row.c[5], row.c[6], row.c[7]].filter(p => p && p.v);
-                productsData[index] = photos;
+                // Photos (Columns F to J)
+                const photoCells = [row.c[5], row.c[6], row.c[7], row.c[8], row.c[9]];
+                const photos = photoCells.filter(p => p && p.v).map(p => p.v);
                 
+                // Category from Column K (index 10)
+                const category = row.c[10] && row.c[10].v ? row.c[10].v.trim() : 'Other';
+
+                if (name) {
+                    if (category) categoriesSet.add(category);
+                    allProducts.push({ name, mrp, price, sole, photos, category });
+                }
+            });
+
+            renderCategoryButtons(Array.from(categoriesSet));
+            filterProducts('ALL');
+        });
+
+        function renderCategoryButtons(categories) {
+            const container = document.getElementById('category-buttons');
+            let html = '';
+            
+            categories.forEach(cat => {
+                html += `<button class="cat-btn" onclick="filterProducts('${cat}')">${cat}</button>`;
+            });
+            
+            html += `<button class="cat-btn all-cat" onclick="filterProducts('ALL')">All Categories</button>`;
+            container.innerHTML = html;
+        }
+
+        function filterProducts(selectedCategory) {
+            const container = document.getElementById('catalog');
+            const heading = document.getElementById('section-heading');
+            container.innerHTML = '';
+
+            let filtered = [];
+            if (selectedCategory === 'ALL') {
+                filtered = allProducts;
+                heading.innerText = 'Trending Products';
+            } else {
+                filtered = allProducts.filter(p => p.category.toLowerCase() === selectedCategory.toLowerCase());
+                heading.innerText = selectedCategory;
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color:#64748b;">No products found in this category.</p>';
+                return;
+            }
+
+            filtered.forEach((product, index) => {
                 let sliderHTML = '';
                 let dotsHTML = '';
                 
-                photos.forEach((p, i) => {
-                    sliderHTML += `<img src="${p.v}" onclick="openCustomModal(${index}, ${i})">`;
-                    if (photos.length > 1) {
-                        dotsHTML += `<div class="dot ${i === 0 ? 'active' : ''}" data-index="${i}"></div>`;
+                product.photos.forEach((photoUrl, i) => {
+                    sliderHTML += `<img src="${photoUrl}" onclick="openCustomModal(${index}, ${i}, '${selectedCategory}')">`;
+                    if (product.photos.length > 1) {
+                        dotsHTML += `<div class="dot ${i === 0 ? 'active' : ''}"></div>`;
                     }
                 });
                 
@@ -91,27 +152,27 @@
                     <div class="card">
                         <div>
                             <div class="slider-container">
-                                <div class="slider" id="slider-${index}" onscroll="updateDots(${index}, ${photos.length})">
+                                <div class="slider" id="slider-${index}" onscroll="updateDots(${index})">
                                     ${sliderHTML}
                                 </div>
                             </div>
                             <div class="dots" id="dots-${index}">
                                 ${dotsHTML}
                             </div>
-                            <div class="name">${name}</div>
+                            <div class="name">${product.name}</div>
                             <div class="price-box">
-                                <div class="price">₹${price}</div>
-                                ${mrp ? `<div class="mrp">₹${mrp}</div>` : ''}
+                                <div class="price">₹${product.price}</div>
+                                ${product.mrp ? `<div class="mrp">₹${product.mrp}</div>` : ''}
                             </div>
-                            ${sole ? `<div class="sole"><b>Sole:</b> ${sole}</div>` : ''}
+                            ${product.sole ? `<div class="sole"><b>Sole:</b> ${product.sole}</div>` : ''}
                         </div>
-                        <a href="https://wa.me/919998366986?text=I want to buy ${name}" class="btn-order" target="_blank">Order on WhatsApp</a>
+                        <a href="https://wa.me/919998366986?text=I want to buy ${product.name}" class="btn-order" target="_blank">Order on WhatsApp</a>
                     </div>
                 `;
             });
-        });
+        }
 
-        function updateDots(cardIndex, totalPhotos) {
+        function updateDots(cardIndex) {
             const slider = document.getElementById(`slider-${cardIndex}`);
             const dotsContainer = document.getElementById(`dots-${cardIndex}`);
             if (!dotsContainer) return;
@@ -130,19 +191,21 @@
             }
         }
 
-        function openCustomModal(productIndex, startIndex) {
-            const photos = productsData[productIndex];
+        function openCustomModal(productIndex, photoIndex, currentCategory) {
+            let filteredList = currentCategory === 'ALL' ? allProducts : allProducts.filter(p => p.category.toLowerCase() === currentCategory.toLowerCase());
+            const product = filteredList[productIndex];
+
             const modalContainer = document.getElementById('modal-img-container');
             modalContainer.innerHTML = '';
             
-            photos.forEach(p => {
-                modalContainer.innerHTML += `<img src="${p.v}">`;
+            product.photos.forEach(src => {
+                modalContainer.innerHTML += `<img src="${src}">`;
             });
             
             document.getElementById('custom-modal').style.display = 'flex';
             
             setTimeout(() => {
-                modalContainer.scrollLeft = startIndex * modalContainer.clientWidth;
+                modalContainer.scrollLeft = photoIndex * modalContainer.clientWidth;
             }, 60);
         }
 
@@ -158,6 +221,7 @@
     </script>
 </body>
 </html>
+
           
 
 
