@@ -7,220 +7,62 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; padding: 10px; margin: 0; }
         h1 { text-align: center; color: #1e293b; margin-bottom: 20px; font-size: 26px; }
-        
-        /* Category Grid Style (Blue & Dark Buttons) */
         .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 500px; margin: 0 auto 25px auto; }
-        .cat-btn { background: #2563eb; color: white; padding: 16px 10px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 15px; cursor: pointer; border: none; transition: 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-        .cat-btn:active { transform: scale(0.98); background: #1d4ed8; }
+        .cat-btn { background: #2563eb; color: white; padding: 16px 10px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 15px; cursor: pointer; border: none; }
         .cat-btn.all-cat { background: #0f172a; }
-        
-        .section-title { text-align: center; margin: 20px 0 4px 0; font-size: 24px; font-weight: bold; color: #1e293b; text-transform: capitalize; }
-        .section-subtitle { text-align: center; color: #64748b; font-size: 14px; margin-bottom: 20px; }
-
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; max-width: 1200px; margin: auto; }
-        .card { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; }
-        
-        .slider-container { position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #fff; }
-        .slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
-        .slider::-webkit-scrollbar { display: none; }
-        .slider img { width: 100%; height: 320px; object-fit: cover; scroll-snap-align: start; flex: 0 0 100%; cursor: pointer; }
-        
-        .dots { display: flex; justify-content: center; gap: 5px; margin: 8px 0; }
-        .dot { width: 6px; height: 6px; background: #cbd5e1; border-radius: 50%; transition: 0.3s; }
-        .dot.active { background: #1e293b; width: 18px; border-radius: 3px; }
-
-        .name { font-size: 16px; font-weight: bold; margin: 8px 0 4px 0; color: #1e293b; }
-        .price-box { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
-        .price { color: #16a34a; font-size: 16px; font-weight: bold; }
-        .mrp { text-decoration: line-through; color: #94a3b8; font-size: 13px; }
-        .sole { font-size: 13px; color: #64748b; margin-bottom: 8px; }
-        
-        .btn-order { display: block; background: #25d366; color: white; padding: 10px; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; }
-        
-        /* Fullscreen Modal */
-        #custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-box { position: relative; width: 95%; max-width: 450px; height: 80vh; display: flex; align-items: center; }
-        .modal-slider { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; width: 100%; height: 100%; scrollbar-width: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
-        .modal-slider::-webkit-scrollbar { display: none; }
-        .modal-slider img { width: 100%; height: 100%; object-fit: contain; scroll-snap-align: start; flex: 0 0 100%; background: transparent; }
-        
-        #close-btn { position: absolute; top: 15px; right: 20px; color: white; font-size: 40px; cursor: pointer; font-weight: bold; z-index: 10000; }
-        
-        .modal-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.3); color: white; border: none; font-size: 24px; padding: 12px 16px; cursor: pointer; border-radius: 50%; z-index: 10000; }
-        .modal-arrow.left { left: 10px; }
-        .modal-arrow.right { right: 10px; }
+        .card { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .slider-container { position: relative; width: 100%; border-radius: 8px; overflow: hidden; }
+        .slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .slider img { width: 100%; height: 320px; object-fit: cover; scroll-snap-align: start; flex: 0 0 100%; }
+        .name { font-size: 16px; font-weight: bold; margin: 8px 0; }
+        .price { color: #16a34a; font-weight: bold; }
+        .btn-order { display: block; background: #25d366; color: white; padding: 10px; text-align: center; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 10px; }
+        .btn-share { display: block; background: #64748b; color: white; padding: 8px; text-align: center; border-radius: 6px; text-decoration: none; font-size: 12px; margin-top: 5px; cursor: pointer; border: none; width: 100%;}
     </style>
 </head>
 <body>
     <h1>Divya Shopee</h1>
-
-    <!-- Category Buttons Section -->
     <div class="category-grid" id="category-buttons"></div>
-
-    <div class="section-title" id="section-heading">Trending Products</div>
-    <div class="section-subtitle">Our trends that customers love!</div>
-
     <div class="product-grid" id="catalog"></div>
-
-    <!-- Fullscreen Modal -->
-    <div id="custom-modal">
-        <span id="close-btn" onclick="closeCustomModal()">&times;</span>
-        <button class="modal-arrow left" onclick="scrollModal(-1)">&#10094;</button>
-        <button class="modal-arrow right" onclick="scrollModal(1)">&#10095;</button>
-        <div class="modal-box">
-            <div class="modal-slider" id="modal-img-container"></div>
-        </div>
-    </div>
 
     <script>
         const sheetId = '1PDHNxST-LElVwOmtpmnBeF6z1AAPifzEF_sbNpAabdA';
         const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
-
         let allProducts = [];
 
         fetch(url).then(res => res.text()).then(text => {
             const data = JSON.parse(text.substr(47).slice(0, -2));
-            allProducts = [];
-            let categoriesSet = new Set();
-            
-            data.table.rows.forEach((row) => {
-                const name = row.c[0] ? row.c[0].v : '';
-                const mrp = row.c[1] ? row.c[1].v : '';
-                const price = row.c[2] ? row.c[2].v : '';
-                const sole = row.c[4] ? row.c[4].v : '';
-                
-                // Photos (Columns F to J)
-                const photoCells = [row.c[5], row.c[6], row.c[7], row.c[8], row.c[9]];
-                const photos = photoCells.filter(p => p && p.v).map(p => p.v);
-                
-                // Category from Column K (index 10)
-                const category = row.c[10] && row.c[10].v ? row.c[10].v.trim() : 'Other';
-
-                if (name) {
-                    if (category) categoriesSet.add(category);
-                    allProducts.push({ name, mrp, price, sole, photos, category });
-                }
+            data.table.rows.forEach(row => {
+                const name = row.c[0]?.v;
+                const price = row.c[2]?.v;
+                const photos = [row.c[5], row.c[6], row.c[7], row.c[8], row.c[9]].filter(p => p?.v).map(p => p.v);
+                const category = row.c[10]?.v?.trim() || 'Other';
+                allProducts.push({ name, price, photos, category });
             });
-
-            renderCategoryButtons(Array.from(categoriesSet));
-            filterProducts('ALL');
+            render();
         });
 
-        function renderCategoryButtons(categories) {
-            const container = document.getElementById('category-buttons');
-            let html = '';
-            
-            categories.forEach(cat => {
-                html += `<button class="cat-btn" onclick="filterProducts('${cat}')">${cat}</button>`;
-            });
-            
-            html += `<button class="cat-btn all-cat" onclick="filterProducts('ALL')">All Categories</button>`;
-            container.innerHTML = html;
-        }
-
-        function filterProducts(selectedCategory) {
+        function render(cat = 'ALL') {
             const container = document.getElementById('catalog');
-            const heading = document.getElementById('section-heading');
             container.innerHTML = '';
-
-            let filtered = [];
-            if (selectedCategory === 'ALL') {
-                filtered = allProducts;
-                heading.innerText = 'Trending Products';
-            } else {
-                filtered = allProducts.filter(p => p.category.toLowerCase() === selectedCategory.toLowerCase());
-                heading.innerText = selectedCategory;
-            }
-
-            if (filtered.length === 0) {
-                container.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color:#64748b;">No products found in this category.</p>';
-                return;
-            }
-
-            filtered.forEach((product, index) => {
-                let sliderHTML = '';
-                let dotsHTML = '';
-                
-                product.photos.forEach((photoUrl, i) => {
-                    sliderHTML += `<img src="${photoUrl}" onclick="openCustomModal(${index}, ${i}, '${selectedCategory}')">`;
-                    if (product.photos.length > 1) {
-                        dotsHTML += `<div class="dot ${i === 0 ? 'active' : ''}"></div>`;
-                    }
-                });
-                
+            const filtered = (cat === 'ALL') ? allProducts : allProducts.filter(p => p.category === cat);
+            
+            filtered.forEach(p => {
                 container.innerHTML += `
                     <div class="card">
-                        <div>
-                            <div class="slider-container">
-                                <div class="slider" id="slider-${index}" onscroll="updateDots(${index})">
-                                    ${sliderHTML}
-                                </div>
-                            </div>
-                            <div class="dots" id="dots-${index}">
-                                ${dotsHTML}
-                            </div>
-                            <div class="name">${product.name}</div>
-                            <div class="price-box">
-                                <div class="price">₹${product.price}</div>
-                                ${product.mrp ? `<div class="mrp">₹${product.mrp}</div>` : ''}
-                            </div>
-                            ${product.sole ? `<div class="sole"><b>Sole:</b> ${product.sole}</div>` : ''}
-                        </div>
-                        <a href="https://wa.me/919998366986?text=I want to buy ${product.name}" class="btn-order" target="_blank">Order on WhatsApp</a>
-                    </div>
-                `;
+                        <div class="slider"><img src="${p.photos[0]}"></div>
+                        <div class="name">${p.name}</div>
+                        <div class="price">₹${p.price}</div>
+                        <a href="https://wa.me/919998366986?text=I want to buy ${p.name}" class="btn-order">Order on WhatsApp</a>
+                        <button class="btn-share" onclick="alert('Link for ${p.name}: https://divyashopee.github.io/index.html')">Share Product</button>
+                    </div>`;
             });
-        }
-
-        function updateDots(cardIndex) {
-            const slider = document.getElementById(`slider-${cardIndex}`);
-            const dotsContainer = document.getElementById(`dots-${cardIndex}`);
-            if (!dotsContainer) return;
-            
-            const scrollLeft = slider.scrollLeft;
-            const cardWidth = slider.clientWidth;
-            const currentIndex = Math.round(scrollLeft / cardWidth);
-            
-            const dots = dotsContainer.children;
-            for (let i = 0; i < dots.length; i++) {
-                if (i === currentIndex) {
-                    dots[i].classList.add('active');
-                } else {
-                    dots[i].classList.remove('active');
-                }
-            }
-        }
-
-        function openCustomModal(productIndex, photoIndex, currentCategory) {
-            let filteredList = currentCategory === 'ALL' ? allProducts : allProducts.filter(p => p.category.toLowerCase() === currentCategory.toLowerCase());
-            const product = filteredList[productIndex];
-
-            const modalContainer = document.getElementById('modal-img-container');
-            modalContainer.innerHTML = '';
-            
-            product.photos.forEach(src => {
-                modalContainer.innerHTML += `<img src="${src}">`;
-            });
-            
-            document.getElementById('custom-modal').style.display = 'flex';
-            
-            setTimeout(() => {
-                modalContainer.scrollLeft = photoIndex * modalContainer.clientWidth;
-            }, 60);
-        }
-
-        function scrollModal(direction) {
-            const modalContainer = document.getElementById('modal-img-container');
-            const cardWidth = modalContainer.clientWidth;
-            modalContainer.scrollLeft += direction * cardWidth;
-        }
-
-        function closeCustomModal() {
-            document.getElementById('custom-modal').style.display = 'none';
         }
     </script>
 </body>
 </html>
+
 
           
 
